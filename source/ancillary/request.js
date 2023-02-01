@@ -14,7 +14,7 @@ class PR_ApiRequest {
     static make(
         path,                // String e.g. '/humans'
         method,              // String e.g. 'GET'
-        parameters=null,     // Optional<PR_UrlQuery>
+        parameters=null,     // Optional<PR_UrlQueryString>
         data=null,           // Object e.g. {'hello': 'world' } (optional)
         callback,            // Function(ApiError?, Data?),
         session=null,        // Optional Session
@@ -110,12 +110,14 @@ class PR_ApiRequest {
         return JSON.parse(quotedBody);
     }
 
-    static _buildUrl(path, parameters, apiEndpoint) {
-        const Self = PR_ApiRequest;
+    static _buildUrl(
+        path,          // String
+        parameters,    // PR_UrlQueryString
+        apiEndpoint    // String
+    ) {
         const base = apiEndpoint + path;
         if (parameters) { return base + parameters.query; }
         return base;
-
     }
 
     static _parseResponse(

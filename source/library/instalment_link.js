@@ -146,7 +146,7 @@ class PR_InstalmentLink {
             PR_ApiRequest.make(
                 PR_InstalmentLink.listPath,
                 'GET',
-                new PR_UrlQuery(parameters),
+                new PR_UrlQueryString(parameters),
                 null,
                 (e, d) => { PR_Response.decodeMany(e, d, callback, Self); },
                 session

@@ -1,6 +1,6 @@
 /* Procuret JS - QueryString */
 
-class PR_UrlQuery {
+class PR_UrlQueryString {
 
     constructor(
         url_parameters  // Array<PR_UrlParameter>
