@@ -129,7 +129,7 @@ class PR_InstalmentLink {
 
             if (textFragment) { throw Error('text search not implemented'); }
 
-            const Self = PR_InstalmentLink; const UP = PR_UrlParameter;
+            const Self = PR_InstalmentLink; const UP = PR_QueryTerm;
     
             const parameters = [
                 new UP('limit', limit),
@@ -146,7 +146,7 @@ class PR_InstalmentLink {
             PR_ApiRequest.make(
                 PR_InstalmentLink.listPath,
                 'GET',
-                new PR_UrlQueryString(parameters),
+                new PR_QueryString(parameters),
                 null,
                 (e, d) => { PR_Response.decodeMany(e, d, callback, Self); },
                 session

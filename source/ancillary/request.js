@@ -14,9 +14,9 @@ class PR_ApiRequest {
     static make(
         path,                // String e.g. '/humans'
         method,              // String e.g. 'GET'
-        parameters=null,     // Optional<PR_UrlQueryString>
+        parameters=null,     // Optional<PR_QueryString>
         data=null,           // Object e.g. {'hello': 'world' } (optional)
-        callback,            // Function(ApiError?, Data?),
+        callback,            // Function(PR_ApiError?, Data?),
         session=null,        // Optional Session
         apiEndpoint=null,    // Optional String
         withoutAuth=false,   // Boolean (send request with no authentication)
@@ -84,8 +84,6 @@ class PR_ApiRequest {
                 return; 
             }
     
-            Self._applyCookieOverride(path, request);
-    
             applyAuth(session);
     
             if (data) {
@@ -104,7 +102,7 @@ class PR_ApiRequest {
 
     static integerSafeJSONParse(string) {
         const quotedBody = string.replace(
-            QUOTE_EXPRESSION,
+            PR_ApiRequest._QUOTE_EXPRESSION,
             '\"$&\"'
         );
         return JSON.parse(quotedBody);
@@ -112,7 +110,7 @@ class PR_ApiRequest {
 
     static _buildUrl(
         path,          // String
-        parameters,    // PR_UrlQueryString
+        parameters,    // PR_QueryString
         apiEndpoint    // String
     ) {
         const base = apiEndpoint + path;
@@ -155,17 +153,16 @@ class PR_ApiRequest {
             try {
                 errorContent = Self.integerSafeJSONParse(request.responseText);
             } catch (error) {
-                const e = new ApiError(
+                const e = new PR_ApiError(
                     status,
                     null,
                     summary
                 );
-                e.dispatchEvent();
                 callback(e, null);
                 return
             }
 
-            const error = new ApiError(status, errorContent, summary);
+            const error = new PR_ApiError(status, errorContent, summary);
             error.dispatchEvent();
             callback(error, null);
 
@@ -178,17 +175,16 @@ class PR_ApiRequest {
             try {
                 errorContent = Self.integerSafeJSONParse(request.responseText);
             } catch (error) {
-                const e = new ApiError(
+                const e = new PR_ApiError(
                     status,
                     null,
                     summary
                 );
-                e.dispatchEvent();
                 callback(e, null);
                 return
             }
 
-            const error = new ApiError(status, errorContent, summary);
+            const error = new PR_ApiError(status, errorContent, summary);
             error.dispatchEvent();
             callback(error, null);
             return;

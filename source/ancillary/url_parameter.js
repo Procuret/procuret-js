@@ -1,11 +1,11 @@
 /* Procuret JS - Url Parameter Type */
 
 
-class PR_UrlParameter {
+class PR_QueryTerm {
 
     constructor(key, value) {
         this._key = key;
-        this._value = PR_UrlParameter._interpretValue(value);
+        this._value = PR_QueryTerm._interpretValue(value);
         return;
     }
 
@@ -27,12 +27,12 @@ class PR_UrlParameter {
 
         if (value == null) { return array; }
 
-        array.push(new PR_UrlParameter(key, value));
+        array.push(new PR_QueryTerm(key, value));
 
         return array;
 
     }
 
-    static cp(k, v, a) { return PR_UrlParameter.compactPush(k, v, a); }
+    static cp(k, v, a) { return PR_QueryTerm.compactPush(k, v, a); }
 
 }

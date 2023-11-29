@@ -1,1 +1,4 @@
 **/procuret.js
+.DS_Store
+**/test.html
+*.pyc

@@ -1,9 +1,9 @@
 /* Procuret JS - QueryString */
 
-class PR_UrlQueryString {
+class PR_QueryString {
 
     constructor(
-        url_parameters  // Array<PR_UrlParameter>
+        url_parameters  // Array<PR_QueryTerm>
     ) {
 
         if (url_parameters.length === undefined) {
