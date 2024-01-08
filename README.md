@@ -1,9 +1,14 @@
 # Introduction
 
 Procuret API JavaScript (PJS) allows you to perform Procuret API operations in
-JavaScript code. Its only dependency is a "typical" browser-like environment.
+JavaScript code. For example, you might like to look up the prices of Procuret
+Instalment Plan products, and present them to customers in your e-commerce
+software.
+
+The only dependency PJS requires is a "typical" browser-like environment.
 That is, it must run in an environment that has browser-like APIs available,
-such as `XMLHTTPRequest`.
+such as `XMLHTTPRequest`. This might be a literal web browser, or a browser
+derivative like NodeJS.
 
 PJS is provided as raw JavaScript files which you can manually package as you
 see fit. For example, you might copy and paste relevant files for your use
@@ -178,7 +183,11 @@ A `procuret.js` file will appear in the `tools` directory.
 
 # Running Tests
 
-PJS includes a built in test GUI. To run the tests, first compile the test
+PJS includes a built in test GUI.
+
+<img width="1035" alt="Screenshot 2023-11-29 at 13 19 49" src="https://github.com/Procuret/procuret-js/assets/7691451/e7630153-663e-4454-9b18-aa0e062aab54">
+
+To run the tests, first compile the test
 tool:
 
 ```bash
