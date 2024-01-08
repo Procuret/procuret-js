@@ -7,11 +7,11 @@ class PR_ProspectivePayment {
     static get listPath() { return PR_ProspectivePayment.path + '/list'; }
 
     constructor(
-        payment,
-        rawCycle,
-        supplierId,
-        periods,
-        currency
+        payment,     // String (String encoded decimal number)
+        rawCycle,    // Number (Integer)
+        supplierId,  // String
+        periods,     // Number (Integer)
+        currency     // PR_Currency
     ) {
 
         this._payment = payment;
@@ -23,10 +23,10 @@ class PR_ProspectivePayment {
         return;
     }
 
-    // The number of months over which payment would be made
+    // Number (The number of months over which payment would be made)
     get periods() { return this._periods; }
 
-    // The monthly payment amount
+    // PR_Amount (The monthly payment amount)
     get amount() {
         return new PR_Amount(
             this._payment,
@@ -47,6 +47,11 @@ class PR_ProspectivePayment {
         );
     }
 
+    /*
+    Retrieve a single PR_ProspectivePayment for given parameters. To use this
+    method, you must know a valid months value in advance. If you don't know a
+    valid months value in advance, prefer .retrieveAllAvailable.
+    */
     static retrieve(
         callback,     // Function<Error?, PR_ProspectivePayment?>
         principal,    // String - A number, the prospective loan princpal
@@ -95,6 +100,11 @@ class PR_ProspectivePayment {
 
     }
 
+    /*
+    Retrieve all available PR_ProspectivePayment for given parameters. This is
+    a convenient way to display all potential instalment plan payment amounts
+    to a potential applicant.
+    */
     static retrieveAllAvailable(
         callback,     // Function<Error?, Array<ProspectivePayment>?>
         principal,    // String - A number, the prospective loan principal
