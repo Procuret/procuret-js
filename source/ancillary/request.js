@@ -6,7 +6,7 @@ class PR_ApiRequest {
     static get _KEY_HEADER() { return 'x-procuret-api-key' }
     static get _SESSION_ID_HEADER() { return 'x-procuret-session-id' }
     static get _JSON_HEADER() { return 'application/json;charset=UTF-8'; }
-    static get _LIVE_ENDPOINT() { 'https://procuret.com/api' }
+    static get _LIVE_ENDPOINT() { return 'https://procuret.com/api' }
     static get _QUOTE_EXPRESSION() { new RegExp(
         /(\b\d{13,128}\b)(?!\.)(?!\/)(?!\%)(?!")(?!:)(?!-)/g
     ); }
