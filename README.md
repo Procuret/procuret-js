@@ -1,214 +1,354 @@
-# Introduction
+# Procuret JS SDK
 
-Procuret API JavaScript (PJS) allows you to perform Procuret API operations in
-JavaScript code. For example, you might like to look up the prices of Procuret
-Instalment Plan products, and present them to customers in your e-commerce
-software.
+Official JavaScript SDK for the Procuret API. Retrieve instalment plan pricing, create payment links, and integrate Procuret into your e-commerce platform.
 
-The only dependency PJS requires is a "typical" browser-like environment.
-That is, it must run in an environment that has browser-like APIs available,
-such as `XMLHTTPRequest`. This might be a literal web browser, or a browser
-derivative like NodeJS.
+## Installation
 
-PJS is provided as raw JavaScript files which you can manually package as you
-see fit. For example, you might copy and paste relevant files for your use
-case and include them in your software. You can also use included Python tools
-to package PJS for include in HTML documents or for provision via a web server.
-(See "Packaging Tools" below.)
+```bash
+npm install procuret-js
+```
 
-Tests are provided for verification of functionality.
+**Requirements:** Node.js 20+ (for Node.js usage) or any modern browser.
 
-## Versioning and public interfaces
+## Quick Start
 
-PJS follows [Semantic Versioning](https://semver.org) conventions. At any time,
-the repository may included an undocumented type in the `source` directory.
-These types should be considered unavailable and their function is not
-guaranteed.
+### ES Modules (Recommended)
 
-# Available Types
+```javascript
+import { PR_ProspectivePayment, PR_Currency } from 'procuret-js';
 
-## `PR_ProspectivePayment`
+PR_ProspectivePayment.retrieveAllAvailable(
+    (error, payments) => {
+        if (error) {
+            console.error('Error:', error);
+            return;
+        }
 
-A theoretical payment amount, and the number of months over which that payment
-would be made, if an applicant successfully applied for a Procuret Instalment
-Plan.
+        payments.forEach(payment => {
+            console.log(`${payment.periods} months: ${payment.amount.asDenominatedString}/month`);
+        });
+    },
+    '1000',              // Principal amount
+    PR_Currency.AUD,     // Currency
+    'YOUR_SUPPLIER_ID'   // Your Procuret Supplier ID
+);
+```
 
-### Properties
+### CommonJS
 
-- `.periods` - `Number` - The number of months over which payment would be made
-- `.amount` - `PR_Amount` - The monthly payment amount
-- `.supplierId` - `String` - The ID of the Procuret supplier for which this
-price is valid.
+```javascript
+const { PR_ProspectivePayment, PR_Currency } = require('procuret-js');
 
-### Static Methods
+// Same API as above
+```
 
-#### .retrieve
+### Browser (Script Tag)
 
-Retrieve a single `PR_ProspectivePayment` for given parameters. To use this
-method, you must know a valid `months` value in advance. If you don't know
-a valid `months` value in advance, prefer `.retrieveAllAvailable`.
+```html
+<script src="https://unpkg.com/procuret-js/dist/procuret.browser.js"></script>
+<script>
+    // Classes are available globally
+    PR_ProspectivePayment.retrieveAllAvailable(
+        (error, payments) => {
+            if (error) { alert('Error: ' + error.message); return; }
+            console.log('Available payments:', payments);
+        },
+        '1000',
+        PR_Currency.AUD,
+        'YOUR_SUPPLIER_ID'
+    );
+</script>
+```
 
-##### Parameters
+## API Reference
 
-1. `callback` - `Function<Error?, PR_ProspectivePayment?>` - A function taking
-optional error and result parameters, in which you can handle the API response.
-2. `principal` - `String` - A string-encoded number representing the principal
-value of the prospective loan. For example, a total invoice value. Minimum
-value `500` currency units.
-3. `supplierId` - `String` - Your Supplier ID. Consult your Procuret
-partnership manager if you are unsure of this value.
-4. `denomination` - `PR_Currency` - The monetary denomination of the `principal`
-value.
-5. `months` - `Number` - The integer number of months over which the instalment
-plan would be paid.
-6. `endpoint` - `Optional<String>` - Optionally override the API endpoint.
-Useful in testing a demonstration environments.
-7. [undocumented, do not use, do not provide a value]
+### PR_ProspectivePayment
 
-##### Example Usage
+Calculate theoretical instalment payments for a given principal amount.
+
+#### `.retrieve(callback, principal, supplierId, denomination, months, [endpoint], [session])`
+
+Retrieve a single payment option for a specific term length.
 
 ```javascript
 PR_ProspectivePayment.retrieve(
-    (error, prospectivePayment) => {
-    
-        if (error) { console.log('An error occurred'); return; }
-    
-        console.log('A successful applicant would pay \
-' + payment.amount.asDenominatedString + ' per month');
-
-        return;
-
+    (error, payment) => {
+        if (error) { console.error(error); return; }
+        console.log(`Monthly payment: ${payment.amount.asSymbolisedString}`);
     },
-    "600",            // $600
-    "511291212",      // some Supplier ID
-    PR_Currency.AUD,  // Australian dollars
-    12                // 12 months
+    '600',                // Principal: $600
+    'YOUR_SUPPLIER_ID',
+    PR_Currency.AUD,
+    12                    // 12 months
 );
 ```
 
-#### .retrieveAllAvailable
+#### `.retrieveAllAvailable(callback, principal, denomination, supplierId, [endpoint], [session])`
 
-Retrieve all available `PR_ProspectivePayment` for given parameters. This is
-a convenient way to display all potential instalment plan payment amounts to
-a potential applicant.
-
-##### Parameters
-
-1. `callback` - `Function<Error?, PR_ProspectivePayment?>` - A function taking
-optional error and result parameters, in which you can handle the API response.
-2. `principal` - `String` - A string-encoded number representing the principal
-value of the prospective loan. For example, a total invoice value. Minimum
-value `500` currency units.
-3. `denomination` - `PR_Currency` - The monetary denomination of the `principal`
-value.
-4. `supplierId` - `String` - Your Supplier ID. Consult your Procuret
-partnership manager if you are unsure of this value.
-5. `endpoint` - `Optional<String>` - Optionally override the API endpoint.
-Useful in testing a demonstration environments.
-6. [undocumented, do not use, do not provide a value]
-
-##### Example Usage
+Retrieve all available payment terms for a principal amount.
 
 ```javascript
 PR_ProspectivePayment.retrieveAllAvailable(
-    (error, availablePayments) => {
+    (error, payments) => {
+        if (error) { console.error(error); return; }
 
-        if (error) { console.log('An error occurred'); return; }
-        
-        const availablePayments = payments.map((p) => {
-            return p.amount.asDenominatedString
+        // Display all options to customer
+        payments.forEach(p => {
+            console.log(`${p.periods} months: ${p.amount.asDenominatedString}`);
         });
-
-        console.log('Applicants may choose from the following payments \
-' + availablePayments);
-
-        return;
-    
     },
-    "600",            // $600
-    PR_Currency.AUD,  // Australian dollars
-    "511291212",      // some Supplier ID
-    12                // 12 months
+    '1500',
+    PR_Currency.AUD,
+    'YOUR_SUPPLIER_ID'
 );
 ```
----
-## `PR_Currency`
 
-A unit of monetary denomination
+#### Properties
 
-### Properties
-
-- `iso_4217` - `String` - The ISO 4217 code of this currency
-- `symbol` - `String` - The common-use symbol for this currency
-- `exponent` - `Number` - The integer exponent of the currency's subunits
-- `name` - `String` - The full-form name of this currency
-- `indexid` - `Number` - A unique integer identifier for the currency in the
-Procure context
-
-### Static Properties
-
-- `.AUD` - `PR_Currency` - Australian dollars
-- `.NZD` - `PR_Currency` - New Zealand dollars
-- `.allAvailable` - `Array<PR_Currency>` - All available currencies
+| Property | Type | Description |
+|----------|------|-------------|
+| `periods` | `number` | Number of monthly payments |
+| `amount` | `PR_Amount` | Monthly payment amount |
+| `supplierId` | `string` | Supplier ID this quote is valid for |
 
 ---
-## `PR_Amount`
 
-A monetary amount, a combination of magnitude and currency denomination
+### PR_Currency
 
-### Properties
+Monetary currency enumeration.
 
-- `asNumber` - `Number` - The amount magnitude cast to a JavaScript `Number`
-- `asLocaleString` - `String` - A Locale-defined string representation
-- `asSymbolisedString` - `String` - The amount prefixed by its currency symbol
-- `asDenominatedString` - `String` - The amount prefixed by its ISO 4217 code
-- `magnitude` - `String` - The undenominated magnitude of the amount
-- `denomination` - `PR_Currency` - The denomination of the amount
-- `isGreaterThanZero` - `Boolean` - `true` if the magnitude of the amount is
-greater than zero, else `false`
+```javascript
+import { PR_Currency } from 'procuret-js';
 
+// Available currencies
+PR_Currency.AUD  // Australian Dollar
+PR_Currency.NZD  // New Zealand Dollar
 
-# Packaging Tools
+// All available currencies
+PR_Currency.allAvailable  // [PR_Currency.AUD, PR_Currency.NZD]
 
-PJS includes built in Python tools for packaging. To compile the entire PJS
-library into a single JavaScript file, invoke the following Python commands
-from the `tools` directory:
-
-```bash
-$ cd tools
-$ python3 compile.py
+// Lookup by ID
+PR_Currency.withId(1)  // PR_Currency.AUD
 ```
 
-A `procuret.js` file will appear in the `tools` directory.
+#### Properties
 
-# Running Tests
+| Property | Type | Description |
+|----------|------|-------------|
+| `indexid` | `number` | Unique identifier |
+| `iso_4217` | `string` | ISO 4217 code (e.g., 'AUD') |
+| `name` | `string` | Full name (e.g., 'Australian Dollar') |
+| `symbol` | `string` | Currency symbol (e.g., '$') |
+| `exponent` | `number` | Decimal places (e.g., 2) |
 
-PJS includes a built in test GUI.
+---
 
-<img width="1035" alt="Screenshot 2023-11-29 at 13 19 49" src="https://github.com/Procuret/procuret-js/assets/7691451/e7630153-663e-4454-9b18-aa0e062aab54">
+### PR_Amount
 
-To run the tests, first compile the test
-tool:
+Monetary amount with magnitude and currency.
 
-```bash
-$ cd tools
-$ python3 compile_tests.py
+```javascript
+import { PR_Amount, PR_Currency } from 'procuret-js';
+
+const amount = new PR_Amount('1234.56', PR_Currency.AUD);
+
+amount.magnitude           // '1234.56'
+amount.denomination        // PR_Currency.AUD
+amount.asNumber            // 1234.56
+amount.asLocaleString      // '1,234.56'
+amount.asSymbolisedString  // '$1,234.56'
+amount.asDenominatedString // 'AUD 1,234.56'
+amount.isGreaterThanZero   // true
+
+// Round to decimal places
+amount.rounded(0).magnitude  // '1235'
 ```
 
-A `test.html` document will appear in the `tools` directory. Serve `test.html`
-from a web server, and then interact with the tool via a web browser. For
-example, you can locally serve the tools directory using...
+---
 
-```bash
-$ python3 -m http.server
+### PR_InstalmentLink
+
+Create and manage payment links for customers.
+
+#### `.create(callback, supplierId, amount, identifier, inviteeEmail, communicate, [inviteePhone], [saleName], [session])`
+
+```javascript
+import { PR_InstalmentLink, PR_Amount, PR_Currency } from 'procuret-js';
+
+const amount = new PR_Amount('2500', PR_Currency.AUD);
+
+PR_InstalmentLink.create(
+    (error, link) => {
+        if (error) { console.error(error); return; }
+        console.log('Link created:', link.publicId);
+    },
+    123456,                    // Supplier ID
+    amount,                    // Invoice amount
+    'INV-2024-001',           // Invoice identifier
+    'customer@example.com',   // Customer email
+    true                      // Send email notification
+);
 ```
 
-... Whereupon the test tool is available at http://127.0.0.1:8000/test.html.
+#### `.retrieve(publicId, callback, [session])`
 
-Note that you cannot open `test.html` in your browser from the file system
-with a modern security-standards-compliant browser. All tests will fail due to browser's Cross-Origin-Resource-Sharing requirements being unmet.
+```javascript
+PR_InstalmentLink.retrieve(
+    'abc123',
+    (error, link) => {
+        if (error) { console.error(error); return; }
+        console.log('Invoice:', link.invoiceIdentifier);
+        console.log('Amount:', link.amount.asDenominatedString);
+        console.log('Opened:', link.hasBeenOpened);
+    }
+);
+```
 
-# Get Help
+#### Properties
 
-To get help integrating PJS into your software, write to your Procuret
-partnership manager, or write to our team at hello@procuret.com.
+| Property | Type | Description |
+|----------|------|-------------|
+| `publicId` | `string` | Unique link identifier |
+| `supplier` | `PR_EntityHeadline` | Supplier information |
+| `created` | `PR_Time` | Creation timestamp |
+| `invoiceAmount` | `string` | Invoice amount (raw) |
+| `amount` | `PR_Amount` | Invoice amount with currency |
+| `invoiceIdentifier` | `string` | Your invoice reference |
+| `inviteeEmail` | `string \| null` | Customer email |
+| `hasBeenOpened` | `boolean` | Whether link was opened |
+| `openCount` | `number` | Number of times opened |
+
+---
+
+## TypeScript Support
+
+Full TypeScript definitions are included. Import types directly:
+
+```typescript
+import {
+    PR_ProspectivePayment,
+    PR_Currency,
+    PR_Amount,
+    Session
+} from 'procuret-js';
+
+const session: Session = {
+    apiKey: 'your-api-key',
+    sessionId: 'your-session-id'
+};
+
+PR_ProspectivePayment.retrieve(
+    (error: Error | null, payment: PR_ProspectivePayment | null) => {
+        if (payment) {
+            const amount: PR_Amount = payment.amount;
+            console.log(amount.asDenominatedString);
+        }
+    },
+    '1000',
+    'supplier-id',
+    PR_Currency.AUD,
+    12,
+    null,
+    session
+);
+```
+
+---
+
+## Node.js Support
+
+The SDK works in both browser and Node.js environments. Environment detection is automatic.
+
+```javascript
+// Works the same in Node.js
+import { PR_ProspectivePayment, PR_Currency } from 'procuret-js';
+
+// For custom HTTP handling (e.g., testing), you can inject a custom client:
+import { setHttpClient, HttpClient } from 'procuret-js';
+
+class CustomHttpClient extends HttpClient {
+    request(method, url, headers, body, callback) {
+        // Your custom implementation
+    }
+}
+
+setHttpClient(new CustomHttpClient());
+```
+
+---
+
+## Distribution Formats
+
+| Format | File | Use Case |
+|--------|------|----------|
+| ES Module | `dist/procuret.js` | Modern bundlers, Node.js 20+ |
+| CommonJS | `dist/procuret.cjs` | Older Node.js, require() |
+| Browser IIFE | `dist/procuret.browser.js` | `<script>` tags |
+| Minified | `dist/procuret.min.js` | Production browser use |
+
+---
+
+## Development
+
+### Building
+
+```bash
+npm install
+npm run build
+```
+
+### Testing
+
+```bash
+npm test              # Run tests once
+npm run test:watch    # Watch mode
+npm run test:coverage # With coverage report
+```
+
+### Legacy Tools
+
+The original Python build tools are preserved in `legacy/tools/` for reference.
+
+---
+
+## Error Handling
+
+All API methods use Node.js-style callbacks: `(error, result) => void`
+
+```javascript
+PR_ProspectivePayment.retrieve(
+    (error, payment) => {
+        if (error) {
+            // Handle error
+            if (error instanceof PR_ApiError) {
+                console.log('HTTP Status:', error.code);
+                console.log('User message:', error.customerDescription);
+                console.log('Technical:', error.technicalDescription);
+            } else {
+                console.log('Error:', error.message);
+            }
+            return;
+        }
+
+        // Success - use payment
+        console.log(payment.amount.asDenominatedString);
+    },
+    // ... other parameters
+);
+```
+
+---
+
+## Support
+
+- **Documentation:** Contact your Procuret partnership manager
+- **Email:** hello@procuret.com
+- **Issues:** [GitHub Issues](https://github.com/Procuret/procuret-js/issues)
+
+---
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+Copyright 2023-2024 Procuret Operating Pty Ltd
