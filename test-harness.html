@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procuret JS SDK - Test Harness</title>
+    <link rel="icon" type="image/png" href="procuret.png">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="min-h-screen bg-base-200">
+
+    <!-- Navbar -->
+    <nav class="navbar bg-base-100 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex-1">
+                <span class="text-xl font-semibold">Procuret JS</span>
+                <span class="badge badge-ghost ml-2">SDK Test Harness</span>
+            </div>
+            <div id="sdk-version" class="text-sm text-base-content/50"></div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-6xl">
+
+        <!-- Config Section -->
+        <div class="card bg-base-100 shadow mb-8">
+            <div class="card-body py-5">
+                <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-5">
+                    <label class="form-control">
+                        <div class="label py-1"><span class="label-text font-medium">Supplier ID</span></div>
+                        <input type="text" id="supplier-id" placeholder="e.g., 123456789" class="input input-bordered w-full">
+                    </label>
+                    <label class="form-control">
+                        <div class="label py-1"><span class="label-text font-medium">Currency</span></div>
+                        <select id="global-currency" class="select select-bordered w-full"></select>
+                    </label>
+                    <label class="form-control">
+                        <div class="label py-1"><span class="label-text font-medium">API Endpoint</span></div>
+                        <input type="text" id="api-endpoint" value="https://demo.procuret.com/api" class="input input-bordered w-full">
+                        <div class="label py-0"><span class="label-text-alt text-base-content/50">Production: https://procuret.com/api</span></div>
+                    </label>
+                    <label class="form-control">
+                        <div class="label py-1"><span class="label-text font-medium">API Key <span class="text-base-content/50">(optional)</span></span></div>
+                        <input type="password" id="api-key" placeholder="For authenticated endpoints" class="input input-bordered w-full">
+                    </label>
+                    <label class="form-control">
+                        <div class="label py-1"><span class="label-text font-medium">Session ID <span class="text-base-content/50">(optional)</span></span></div>
+                        <input type="text" id="session-id" placeholder="Required with API Key" class="input input-bordered w-full">
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Cards Grid -->
+        <div class="grid gap-6 md:grid-cols-2">
+
+            <!-- Test 1: retrieve -->
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <h2 class="card-title text-lg">Retrieve Payment</h2>
+                            <span class="badge badge-primary badge-sm">API</span>
+                        </div>
+                        <p class="text-base text-base-content/70 mb-4">Get a single prospective payment for a specific term.</p>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="form-control">
+                                <div class="label"><span class="label-text">Principal</span></div>
+                                <input type="number" id="t1-principal" value="1000" class="input input-bordered w-full">
+                            </label>
+                            <label class="form-control">
+                                <div class="label"><span class="label-text">Months</span></div>
+                                <input type="number" id="t1-months" value="12" class="input input-bordered w-full">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-4">
+                        <button class="btn btn-primary w-full" onclick="runTest1()">Run Test</button>
+                        <div id="result1" class="hidden mt-4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 2: retrieveAllAvailable -->
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <h2 class="card-title text-lg">Retrieve All Payments</h2>
+                            <span class="badge badge-primary badge-sm">API</span>
+                        </div>
+                        <p class="text-base text-base-content/70 mb-4">Get all available payment terms for a principal amount.</p>
+
+                        <label class="form-control">
+                            <div class="label"><span class="label-text">Principal</span></div>
+                            <input type="number" id="t2-principal" value="1000" class="input input-bordered w-full">
+                        </label>
+                    </div>
+
+                    <div class="mt-auto pt-4">
+                        <button class="btn btn-primary w-full" onclick="runTest2()">Run Test</button>
+                        <div id="result2" class="hidden mt-4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 3: PR_Currency -->
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <h2 class="card-title text-lg">Currency Test</h2>
+                            <span class="badge badge-secondary badge-sm">Local</span>
+                        </div>
+                        <p class="text-base text-base-content/70">Test PR_Currency enumeration methods locally.</p>
+                    </div>
+
+                    <div class="mt-auto pt-4">
+                        <button class="btn btn-secondary w-full" onclick="runTest3()">Run Test</button>
+                        <div id="result3" class="hidden mt-4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 4: PR_Amount -->
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <h2 class="card-title text-lg">Amount Test</h2>
+                            <span class="badge badge-secondary badge-sm">Local</span>
+                        </div>
+                        <p class="text-base text-base-content/70 mb-4">Test PR_Amount formatting methods locally.</p>
+
+                        <label class="form-control">
+                            <div class="label"><span class="label-text">Amount</span></div>
+                            <input type="text" id="t4-amount" value="1234.56" class="input input-bordered w-full">
+                        </label>
+                    </div>
+
+                    <div class="mt-auto pt-4">
+                        <button class="btn btn-secondary w-full" onclick="runTest4()">Run Test</button>
+                        <div id="result4" class="hidden mt-4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 5: Retrieve InstalmentLink -->
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <h2 class="card-title text-lg">Retrieve InstalmentLink</h2>
+                            <span class="badge badge-primary badge-sm">API</span>
+                            <span class="badge badge-warning badge-sm">Auth</span>
+                        </div>
+                        <p class="text-base text-base-content/70 mb-4">Get a single instalment link by its public ID.</p>
+
+                        <label class="form-control">
+                            <div class="label"><span class="label-text">Public ID</span></div>
+                            <input type="text" id="t5-public-id" placeholder="e.g., abc123..." class="input input-bordered w-full">
+                        </label>
+                    </div>
+
+                    <div class="mt-auto pt-4">
+                        <button class="btn btn-primary w-full" onclick="runTest5()">Run Test</button>
+                        <div id="result5" class="hidden mt-4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 6: List InstalmentLinks -->
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <h2 class="card-title text-lg">List InstalmentLinks</h2>
+                            <span class="badge badge-primary badge-sm">API</span>
+                            <span class="badge badge-warning badge-sm">Auth</span>
+                        </div>
+                        <p class="text-base text-base-content/70 mb-4">List instalment links with optional filters.</p>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="form-control">
+                                <div class="label"><span class="label-text">Limit</span></div>
+                                <input type="number" id="t6-limit" value="10" class="input input-bordered w-full">
+                            </label>
+                            <label class="form-control">
+                                <div class="label"><span class="label-text">Offset</span></div>
+                                <input type="number" id="t6-offset" value="0" class="input input-bordered w-full">
+                            </label>
+                        </div>
+
+                        <label class="form-control mt-4">
+                            <div class="label"><span class="label-text">Supplier ID <span class="text-base-content/50">(optional filter)</span></span></div>
+                            <input type="text" id="t6-supplier" placeholder="Leave empty to show all" class="input input-bordered w-full">
+                        </label>
+                    </div>
+
+                    <div class="mt-auto pt-4">
+                        <button class="btn btn-primary w-full" onclick="runTest6()">Run Test</button>
+                        <div id="result6" class="hidden mt-4"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Load the browser bundle -->
+    <script src="dist/procuret.browser.js"></script>
+
+    <script>
+        // Cookie helpers
+        function setCookie(name, value, days = 365) {
+            const expires = new Date(Date.now() + days * 864e5).toUTCString();
+            document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/';
+        }
+
+        function getCookie(name) {
+            const value = document.cookie.split('; ').find(row => row.startsWith(name + '='));
+            return value ? decodeURIComponent(value.split('=')[1]) : null;
+        }
+
+        // Load saved values on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedSupplier = getCookie('pr_supplier_id');
+            if (savedSupplier) document.getElementById('supplier-id').value = savedSupplier;
+
+            const savedEndpoint = getCookie('pr_api_endpoint');
+            if (savedEndpoint) document.getElementById('api-endpoint').value = savedEndpoint;
+
+            // Populate global currency dropdown
+            const currencySelect = document.getElementById('global-currency');
+            currencySelect.innerHTML = PR_Currency.allAvailable
+                .map(c => `<option value="${c.indexid}">${c.iso_4217} - ${c.name}</option>`)
+                .join('');
+
+            const savedCurrency = getCookie('pr_currency');
+            if (savedCurrency) currencySelect.value = savedCurrency;
+        });
+
+        // Save config values when changed
+        document.addEventListener('input', (e) => {
+            if (e.target.id === 'supplier-id') setCookie('pr_supplier_id', e.target.value);
+            if (e.target.id === 'api-endpoint') setCookie('pr_api_endpoint', e.target.value);
+        });
+
+        document.addEventListener('change', (e) => {
+            if (e.target.id === 'global-currency') setCookie('pr_currency', e.target.value);
+        });
+
+        // Get supplier ID from config
+        function getSupplierId() {
+            return document.getElementById('supplier-id').value;
+        }
+
+        // Get currency from global config
+        function getCurrency() {
+            const currencyId = parseInt(document.getElementById('global-currency').value);
+            return PR_Currency.withId(currencyId);
+        }
+
+        // Helper to show results with tabs
+        function showResult(id, success, friendlyMessage, jsonData = null, httpStatus = null) {
+            const el = document.getElementById(id);
+            const hasJson = jsonData !== null;
+
+            const statusBadge = httpStatus !== null
+                ? `<span class="px-3 py-1 rounded-full text-sm font-medium ml-2 ${success ? 'bg-success text-success-content' : 'bg-error text-error-content'}">HTTP ${httpStatus}</span>`
+                : '';
+
+            if (!hasJson) {
+                // Simple display without tabs
+                el.className = 'mt-4';
+                el.innerHTML = `
+                    <div class="alert ${success ? 'alert-success' : 'alert-error'}">
+                        ${statusBadge}
+                        <pre class="whitespace-pre-wrap text-sm overflow-x-auto mt-1">${escapeHtml(friendlyMessage)}</pre>
+                    </div>`;
+            } else {
+                // Tabbed display
+                const tabId = id + '-tabs';
+                el.className = 'mt-4';
+                el.innerHTML = `
+                    <div class="flex gap-1 mb-3 items-center">
+                        <button class="btn btn-sm btn-primary" data-tab="${tabId}" data-panel="friendly">Friendly</button>
+                        <button class="btn btn-sm btn-outline" data-tab="${tabId}" data-panel="json">JSON</button>
+                        ${statusBadge}
+                    </div>
+                    <div id="${tabId}-friendly" class="alert ${success ? 'alert-success' : 'alert-error'}">
+                        <pre class="whitespace-pre-wrap text-sm overflow-x-auto">${escapeHtml(friendlyMessage)}</pre>
+                    </div>
+                    <div id="${tabId}-json" class="hidden alert ${success ? 'alert-info' : 'alert-error'}">
+                        <pre class="whitespace-pre-wrap text-sm overflow-x-auto">${escapeHtml(JSON.stringify(jsonData, null, 2))}</pre>
+                    </div>`;
+
+                // Add tab click handlers
+                el.querySelectorAll('button[data-tab]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const panel = btn.dataset.panel;
+                        const tabGroup = btn.dataset.tab;
+
+                        // Update button states
+                        el.querySelectorAll(`button[data-tab="${tabGroup}"]`).forEach(b => {
+                            b.classList.remove('btn-primary');
+                            b.classList.add('btn-outline');
+                        });
+                        btn.classList.remove('btn-outline');
+                        btn.classList.add('btn-primary');
+
+                        // Update panel visibility
+                        document.getElementById(tabGroup + '-friendly').classList.toggle('hidden', panel !== 'friendly');
+                        document.getElementById(tabGroup + '-json').classList.toggle('hidden', panel !== 'json');
+                    });
+                });
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Get endpoint from the field
+        function getEndpoint() {
+            return document.getElementById('api-endpoint').value || 'https://demo.procuret.com/api';
+        }
+
+        // Get session (or null if not provided)
+        function getSession() {
+            const apiKey = document.getElementById('api-key').value;
+            const sessionId = document.getElementById('session-id').value;
+            if (apiKey && sessionId) {
+                return { apiKey, sessionId };
+            }
+            return null;
+        }
+
+        // Test 1: PR_ProspectivePayment.retrieve
+        function runTest1() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Loading...';
+
+            const supplierId = getSupplierId();
+            const principal = document.getElementById('t1-principal').value;
+            const months = parseInt(document.getElementById('t1-months').value);
+            const currency = getCurrency();
+
+            if (!supplierId) {
+                showResult('result1', false, 'Supplier ID is required (set in config above)');
+                btn.disabled = false;
+                btn.textContent = originalText;
+                return;
+            }
+
+            PR_ProspectivePayment.retrieve(
+                (error, payment) => {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+
+                    if (error) {
+                        const httpStatus = error.code || error.status || error.statusCode || 'Error';
+                        const jsonData = { error: error.message, code: httpStatus };
+                        showResult('result1', false, error.message, jsonData, httpStatus);
+                        return;
+                    }
+
+                    const output = [
+                        'Periods: ' + payment.periods + ' months',
+                        'Monthly: ' + payment.amount.asDenominatedString,
+                        'Display: ' + payment.amount.asSymbolisedString
+                    ].join('\n');
+
+                    const jsonData = {
+                        periods: payment.periods,
+                        amount: {
+                            magnitude: payment.amount.magnitude,
+                            currency: payment.amount.denomination.iso_4217
+                        },
+                        supplierId: payment.supplierId
+                    };
+
+                    showResult('result1', true, output, jsonData, 200);
+                },
+                principal,
+                supplierId,
+                currency,
+                months,
+                getEndpoint(),
+                getSession()
+            );
+        }
+
+        // Test 2: PR_ProspectivePayment.retrieveAllAvailable
+        function runTest2() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Loading...';
+
+            const supplierId = getSupplierId();
+            const principal = document.getElementById('t2-principal').value;
+            const currency = getCurrency();
+
+            if (!supplierId) {
+                showResult('result2', false, 'Supplier ID is required (set in config above)');
+                btn.disabled = false;
+                btn.textContent = originalText;
+                return;
+            }
+
+            PR_ProspectivePayment.retrieveAllAvailable(
+                (error, payments) => {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+
+                    if (error) {
+                        const httpStatus = error.code || error.status || error.statusCode || 'Error';
+                        const jsonData = { error: error.message, code: httpStatus };
+                        showResult('result2', false, error.message, jsonData, httpStatus);
+                        return;
+                    }
+
+                    if (!payments || payments.length === 0) {
+                        showResult('result2', false, 'No payment options available', { payments: [] }, 200);
+                        return;
+                    }
+
+                    const lines = payments.map(p =>
+                        p.periods + ' mo: ' + p.amount.asDenominatedString
+                    );
+
+                    const jsonData = payments.map(p => ({
+                        periods: p.periods,
+                        amount: {
+                            magnitude: p.amount.magnitude,
+                            currency: p.amount.denomination.iso_4217
+                        },
+                        supplierId: p.supplierId
+                    }));
+
+                    showResult('result2', true, lines.join('\n'), jsonData, 200);
+                },
+                principal,
+                currency,
+                supplierId,
+                getEndpoint(),
+                getSession()
+            );
+        }
+
+        // Test 3: PR_Currency (local)
+        function runTest3() {
+            try {
+                const aud = PR_Currency.AUD;
+                const nzd = PR_Currency.NZD;
+
+                const output = [
+                    'AUD: ' + aud.iso_4217 + ' (' + aud.symbol + ') - ' + aud.name,
+                    'NZD: ' + nzd.iso_4217 + ' (' + nzd.symbol + ') - ' + nzd.name,
+                    '',
+                    'withId(1): ' + PR_Currency.withId(1).iso_4217,
+                    'withId(2): ' + PR_Currency.withId(2).iso_4217,
+                    'allAvailable: ' + PR_Currency.allAvailable.length + ' currencies'
+                ].join('\n');
+
+                const jsonData = {
+                    AUD: { indexid: aud.indexid, iso_4217: aud.iso_4217, name: aud.name, symbol: aud.symbol, exponent: aud.exponent },
+                    NZD: { indexid: nzd.indexid, iso_4217: nzd.iso_4217, name: nzd.name, symbol: nzd.symbol, exponent: nzd.exponent },
+                    allAvailable: PR_Currency.allAvailable.map(c => c.iso_4217)
+                };
+
+                showResult('result3', true, output, jsonData);
+            } catch (e) {
+                showResult('result3', false, e.message, { error: e.message });
+            }
+        }
+
+        // Test 4: PR_Amount (local)
+        function runTest4() {
+            try {
+                const magnitude = document.getElementById('t4-amount').value;
+                const currency = getCurrency();
+                const amount = new PR_Amount(magnitude, currency);
+
+                const output = [
+                    'Input: ' + magnitude + ' ' + currency.iso_4217,
+                    '',
+                    'asNumber: ' + amount.asNumber,
+                    'asLocaleString: ' + amount.asLocaleString,
+                    'asSymbolisedString: ' + amount.asSymbolisedString,
+                    'asDenominatedString: ' + amount.asDenominatedString,
+                    '',
+                    'rounded(0): ' + amount.rounded(0).magnitude,
+                    'rounded(1): ' + amount.rounded(1).magnitude
+                ].join('\n');
+
+                const jsonData = {
+                    input: { magnitude, currency: currency.iso_4217 },
+                    asNumber: amount.asNumber,
+                    asLocaleString: amount.asLocaleString,
+                    asSymbolisedString: amount.asSymbolisedString,
+                    asDenominatedString: amount.asDenominatedString,
+                    isGreaterThanZero: amount.isGreaterThanZero,
+                    rounded: {
+                        '0': amount.rounded(0).magnitude,
+                        '1': amount.rounded(1).magnitude
+                    }
+                };
+
+                showResult('result4', true, output, jsonData);
+            } catch (e) {
+                showResult('result4', false, e.message, { error: e.message });
+            }
+        }
+
+        // Test 5: PR_InstalmentLink.retrieve
+        function runTest5() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Loading...';
+
+            const publicId = document.getElementById('t5-public-id').value;
+            const session = getSession();
+
+            if (!publicId) {
+                showResult('result5', false, 'Public ID is required');
+                btn.disabled = false;
+                btn.textContent = originalText;
+                return;
+            }
+
+            if (!session) {
+                showResult('result5', false, 'API Key and Session ID are required for authenticated endpoints');
+                btn.disabled = false;
+                btn.textContent = originalText;
+                return;
+            }
+
+            PR_InstalmentLink.retrieve(
+                publicId,
+                (error, link) => {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+
+                    if (error) {
+                        const httpStatus = error.code || error.status || error.statusCode || 'Error';
+                        const jsonData = { error: error.message, code: httpStatus };
+                        showResult('result5', false, error.message, jsonData, httpStatus);
+                        return;
+                    }
+
+                    if (!link) {
+                        showResult('result5', false, 'No instalment link found', null, 404);
+                        return;
+                    }
+
+                    const output = [
+                        'Public ID: ' + link.publicId,
+                        'Amount: ' + link.amount.asDenominatedString,
+                        'Invoice: ' + link.invoiceIdentifier,
+                        'Invitee: ' + (link.inviteeEmail || 'N/A'),
+                        'Supplier: ' + (link.supplier ? link.supplier.name : 'N/A'),
+                        'Opens: ' + link.openCount,
+                        'Created: ' + link.created
+                    ].join('\n');
+
+                    const jsonData = {
+                        publicId: link.publicId,
+                        amount: link.amount.magnitude,
+                        currency: link.denomination.iso_4217,
+                        invoiceIdentifier: link.invoiceIdentifier,
+                        inviteeEmail: link.inviteeEmail,
+                        supplier: link.supplier ? { id: link.supplier.id, name: link.supplier.name } : null,
+                        openCount: link.openCount,
+                        created: link.created,
+                        allowEdit: link.allowEdit
+                    };
+
+                    showResult('result5', true, output, jsonData, 200);
+                },
+                session
+            );
+        }
+
+        // Test 6: PR_InstalmentLink.retrieveMany
+        function runTest6() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Loading...';
+
+            const limit = parseInt(document.getElementById('t6-limit').value) || 10;
+            const offset = parseInt(document.getElementById('t6-offset').value) || 0;
+            const supplierId = document.getElementById('t6-supplier').value || null;
+            const session = getSession();
+
+            if (!session) {
+                showResult('result6', false, 'API Key and Session ID are required for authenticated endpoints');
+                btn.disabled = false;
+                btn.textContent = originalText;
+                return;
+            }
+
+            PR_InstalmentLink.retrieveMany(
+                (error, links) => {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+
+                    if (error) {
+                        const httpStatus = error.code || error.status || error.statusCode || 'Error';
+                        const jsonData = { error: error.message, code: httpStatus };
+                        showResult('result6', false, error.message, jsonData, httpStatus);
+                        return;
+                    }
+
+                    if (!links || links.length === 0) {
+                        showResult('result6', false, 'No instalment links found', { links: [], count: 0 }, 200);
+                        return;
+                    }
+
+                    const lines = links.map(link =>
+                        link.publicId.substring(0, 8) + '... | ' +
+                        link.amount.asDenominatedString + ' | ' +
+                        link.invoiceIdentifier
+                    );
+                    lines.unshift('Found ' + links.length + ' link(s):');
+                    lines.unshift('Offset: ' + offset + ', Limit: ' + limit);
+
+                    const jsonData = {
+                        count: links.length,
+                        offset: offset,
+                        limit: limit,
+                        links: links.map(link => ({
+                            publicId: link.publicId,
+                            amount: link.amount.magnitude,
+                            currency: link.denomination.iso_4217,
+                            invoiceIdentifier: link.invoiceIdentifier,
+                            inviteeEmail: link.inviteeEmail,
+                            openCount: link.openCount
+                        }))
+                    };
+
+                    showResult('result6', true, lines.join('\n'), jsonData, 200);
+                },
+                limit,
+                offset,
+                PR_Order.DESCENDING,
+                PR_InstalmentLinkOrderBy.CREATED,
+                null,  // textFragment
+                null,  // opened
+                supplierId,
+                session
+            );
+        }
+
+        // Log SDK load and display version
+        console.log('Procuret JS SDK loaded:', Object.keys(window).filter(k => k.startsWith('PR_')));
+        document.getElementById('sdk-version').textContent = 'v' + PR_VERSION;
+    </script>
+
+</body>
+</html>
