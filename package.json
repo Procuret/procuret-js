@@ -1,0 +1,63 @@
+{
+  "name": "procuret-js",
+  "version": "1.0.1",
+  "description": "Procuret API JavaScript SDK - Perform Procuret API operations in JavaScript",
+  "main": "dist/procuret.cjs",
+  "module": "dist/procuret.js",
+  "browser": "dist/procuret.browser.js",
+  "types": "types/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/procuret.js",
+      "require": "./dist/procuret.cjs",
+      "browser": "./dist/procuret.browser.js",
+      "types": "./types/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "types",
+    "src"
+  ],
+  "scripts": {
+    "build": "node scripts/build.js && npm run build:types",
+    "build:js": "node scripts/build.js",
+    "build:types": "tsc",
+    "build:watch": "node scripts/build.js --watch",
+    "clean": "rm -rf dist types",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:browser": "npm run build && node scripts/serve.js",
+    "legacy:compile": "cd legacy/tools && python3 compile.py",
+    "legacy:compile-tests": "cd legacy/tools && python3 compile_tests.py",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Procuret/procuret-js.git"
+  },
+  "keywords": [
+    "procuret",
+    "api",
+    "payments",
+    "instalment",
+    "finance"
+  ],
+  "author": "Procuret Operating Pty Ltd",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Procuret/procuret-js/issues"
+  },
+  "homepage": "https://github.com/Procuret/procuret-js#readme",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.10",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0"
+  }
+}
