@@ -2,3 +2,15 @@
 .DS_Store
 **/test.html
 *.pyc
+
+# Node.js
+node_modules/
+dist/
+coverage/
+*.log
+.npm
+
+# IDE
+.idea/
+*.swp
+*.swo
